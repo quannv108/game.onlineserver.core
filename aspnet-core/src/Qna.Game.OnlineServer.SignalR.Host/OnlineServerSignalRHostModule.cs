@@ -2,13 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Qna.Game.OnlineServer.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using OpenIddict.Validation.AspNetCore;
 using Qna.Game.OnlineServer.SignalR;
 using Volo.Abp;
 using Volo.Abp.AspNetCore.Mvc;
@@ -18,34 +21,43 @@ using Volo.Abp.Modularity;
 using Volo.Abp.Swashbuckle;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
+// using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
+using Qna.Game.OnlineServer.MultiTenancy;
+using Volo.Abp.Account.Web;
+using Volo.Abp.AspNetCore.MultiTenancy;
+using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
+using Volo.Abp.AspNetCore.SignalR;
 
 namespace Qna.Game.OnlineServer;
 
 [DependsOn(
+    typeof(OnlineServerSignalRModule),
     // typeof(OnlineServerHttpApiModule),
     typeof(AbpAutofacModule),
     // typeof(AbpAspNetCoreMultiTenancyModule),
     // typeof(OnlineServerApplicationModule),
     typeof(OnlineServerEntityFrameworkCoreModule),
     // typeof(AbpAspNetCoreMvcUiLeptonXLiteThemeModule),
-    // typeof(AbpAccountWebOpenIddictModule),
+    typeof(AbpAccountWebOpenIddictModule),
     typeof(AbpAspNetCoreSerilogModule),
-    typeof(AbpSwashbuckleModule),
-    typeof(OnlineServerSignalRModule)
+    typeof(AbpSwashbuckleModule)
 )]
 public class OnlineServerSignalRHostModule : AbpModule
 {
     public override void PreConfigureServices(ServiceConfigurationContext context)
     {
-        // PreConfigure<OpenIddictBuilder>(builder =>
-        // {
-        //     builder.AddValidation(options =>
-        //     {
-        //         options.AddAudiences("OnlineServer");
-        //         options.UseLocalServer();
-        //         options.UseAspNetCore();
-        //     });
-        // });
+        var configuration = context.Services.GetConfiguration();
+        PreConfigure<OpenIddictBuilder>(builder =>
+        {
+            builder.AddValidation(options =>
+            {
+                options.AddAudiences("OnlineServer");
+                options.SetIssuer(configuration["AuthServer:Authority"]);
+                options.UseLocalServer();
+                options.UseAspNetCore();
+            });
+        });
     }
 
     public override void ConfigureServices(ServiceConfigurationContext context)
@@ -64,7 +76,14 @@ public class OnlineServerSignalRHostModule : AbpModule
 
     private void ConfigureAuthentication(ServiceConfigurationContext context)
     {
-        // context.Services.ForwardIdentityAuthenticationForBearer(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
+        // context.Services.AddAuthentication(options =>
+        // {
+        //     // Identity made Cookie authentication the default.
+        //     // However, we want JWT Bearer Auth to be the default.
+        //     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        //     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        // });
+        context.Services.ForwardIdentityAuthenticationForBearer(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
     }
 
     private void ConfigureBundles()
@@ -128,7 +147,7 @@ public class OnlineServerSignalRHostModule : AbpModule
             configuration["AuthServer:Authority"],
             new Dictionary<string, string>
             {
-                    {"OnlineServer", "OnlineServer SignalR API"}
+                    {"OnlineServer", "OnlineServer API"}
             },
             options =>
             {
@@ -174,22 +193,22 @@ public class OnlineServerSignalRHostModule : AbpModule
 
         app.UseAbpRequestLocalization();
 
-        // if (!env.IsDevelopment())
-        // {
-        //     app.UseErrorPage();
-        // }
+        if (!env.IsDevelopment())
+        {
+            app.UseErrorPage();
+        }
 
         app.UseCorrelationId();
         app.UseStaticFiles();
         app.UseRouting();
         app.UseCors();
-        // app.UseAuthentication();
-        // app.UseAbpOpenIddictValidation();
+        app.UseAuthentication();
+        app.UseAbpOpenIddictValidation();
 
-        // if (MultiTenancyConsts.IsEnabled)
-        // {
-        //     app.UseMultiTenancy();
-        // }
+        if (MultiTenancyConsts.IsEnabled)
+        {
+            app.UseMultiTenancy();
+        }
 
         app.UseUnitOfWork();
         app.UseAuthorization();

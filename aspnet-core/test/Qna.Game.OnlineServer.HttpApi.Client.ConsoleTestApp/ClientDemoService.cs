@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Volo.Abp.Account;
 using Volo.Abp.DependencyInjection;
+using Volo.Abp.Users;
 
 namespace Qna.Game.OnlineServer.HttpApi.Client.ConsoleTestApp;
 

@@ -6,5 +6,4 @@ namespace Qna.Game.OnlineServer.SignalR;
 [DependsOn(typeof(AbpAspNetCoreSignalRModule))]
 public class OnlineServerSignalRModule : AbpModule
 {
-    
 }

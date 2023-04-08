@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Qna.Game.OnlineServer.Localization;
+﻿using Qna.Game.OnlineServer.Localization;
 using Volo.Abp.Application.Services;
 
 namespace Qna.Game.OnlineServer;
