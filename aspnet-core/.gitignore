@@ -256,7 +256,7 @@ src/Qna.Game.OnlineServer.Web/Logs/*
 src/Qna.Game.OnlineServer.Web.Host/Logs/*
 src/Qna.Game.OnlineServer.AuthServer/Logs/*
 src/Qna.Game.OnlineServer.HttpApi.Host/Logs/*
-src/Qna.Game.OnlineServer.HttpApi.Host/Logs/*
+src/Qna.Game.OnlineServer.SignalR.Host/Logs/*
 src/Qna.Game.OnlineServer.DbMigrator/Logs/*
 src/Qna.Game.OnlineServer.Blazor.Server/Logs/*
 src/Qna.Game.OnlineServer.Blazor.Server.Tiered/Logs/*

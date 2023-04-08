@@ -21,18 +21,18 @@ public class Program
             .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
             .MinimumLevel.Override("Microsoft.EntityFrameworkCore", LogEventLevel.Warning)
             .Enrich.FromLogContext()
-            .WriteTo.Async(c => c.File("Logs/HttpApi/logs.txt"))
+            .WriteTo.Async(c => c.File("Logs/SignalR/logs.txt"))
             .WriteTo.Async(c => c.Console())
             .CreateLogger();
 
         try
         {
-            Log.Information("Starting Qna.Game.OnlineServer.HttpApi.Host.");
+            Log.Information("Starting Qna.Game.OnlineServer.SignalR.Host.");
             var builder = WebApplication.CreateBuilder(args);
             builder.Host.AddAppSettingsSecretsJson()
                 .UseAutofac()
                 .UseSerilog();
-            await builder.AddApplicationAsync<OnlineServerHttpApiHostModule>();
+            await builder.AddApplicationAsync<OnlineServerSignalRHostModule>();
             var app = builder.Build();
             await app.InitializeApplicationAsync();
             await app.RunAsync();
