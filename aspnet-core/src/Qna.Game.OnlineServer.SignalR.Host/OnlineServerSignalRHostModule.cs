@@ -76,13 +76,6 @@ public class OnlineServerSignalRHostModule : AbpModule
 
     private void ConfigureAuthentication(ServiceConfigurationContext context)
     {
-        // context.Services.AddAuthentication(options =>
-        // {
-        //     // Identity made Cookie authentication the default.
-        //     // However, we want JWT Bearer Auth to be the default.
-        //     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        //     options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-        // });
         context.Services.ForwardIdentityAuthenticationForBearer(OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme);
     }
 
