@@ -197,6 +197,28 @@ public class OpenIddictDataSeedContributor : IDataSeedContributor, ITransientDep
                 clientUri: swaggerRootUrl
             );
         }
+        
+        // Swagger Client For SignalR
+        var swaggerSignalRClientId = configurationSection["Swagger_SignalR:ClientId"];
+        if (!swaggerSignalRClientId.IsNullOrWhiteSpace())
+        {
+            var swaggerRootUrl = configurationSection["Swagger_SignalR:RootUrl"]?.TrimEnd('/');
+
+            await CreateApplicationAsync(
+                name: swaggerSignalRClientId!,
+                type: OpenIddictConstants.ClientTypes.Public,
+                consentType: OpenIddictConstants.ConsentTypes.Implicit,
+                displayName: "Swagger Application",
+                secret: null,
+                grantTypes: new List<string>
+                {
+                    OpenIddictConstants.GrantTypes.AuthorizationCode,
+                },
+                scopes: commonScopes,
+                redirectUri: $"{swaggerRootUrl}/swagger/oauth2-redirect.html",
+                clientUri: swaggerRootUrl
+            );
+        }
     }
 
     private async Task CreateApplicationAsync(
