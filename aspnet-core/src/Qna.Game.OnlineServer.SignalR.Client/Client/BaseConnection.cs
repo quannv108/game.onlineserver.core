@@ -1,15 +1,21 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.SignalR.Client;
+using Qna.Game.OnlineServer.SignalR.Contracts.Hub.Main;
+using Qna.Game.OnlineServer.SignalR.Contracts.Match;
+using Qna.Game.OnlineServer.SignalR.Contracts.Match.Events;
 
 namespace Qna.Game.OnlineServer.SignalR.Client.Client;
 
 public abstract class BaseConnection : IAsyncDisposable, IClientConnection
 {
+    public HubConnectionState State => _connection.State;
+    
     private readonly string _authHostUrl;
     private readonly UserCredentials _userUserCredentials;
     private readonly IMessageCallbackHandler _messageCallbackHandler;
-    private readonly HubConnection _connection;
     private readonly HubUrlBuilder _hubUrlBuilder;
+
+    protected readonly HubConnection _connection;
 
     public BaseConnection(string authHostUrl, string signalRHostUrl,
         UserCredentials userUserCredentials,
@@ -17,25 +23,24 @@ public abstract class BaseConnection : IAsyncDisposable, IClientConnection
     {
         _authHostUrl = authHostUrl;
         _userUserCredentials = userUserCredentials;
-        _messageCallbackHandler = messageCallbackHandler;
         _hubUrlBuilder = new HubUrlBuilder(signalRHostUrl);
         var mainHubUri = _hubUrlBuilder.GetMainHub();
         
+        _messageCallbackHandler = messageCallbackHandler;
+        _messageCallbackHandler.Client = this;
+
         _connection = new HubConnectionBuilder()
-            .WithUrl(mainHubUri, options =>
-            { 
-                options.AccessTokenProvider = GetAccessTokenAsync;
-            })
+            .WithUrl(mainHubUri, options => { options.AccessTokenProvider = GetAccessTokenAsync; })
             .WithAutomaticReconnect()
             .Build();
         RegisterCallback();
     }
-    
+
     public ValueTask DisposeAsync()
     {
         return _connection.DisposeAsync();
     }
-    
+
     public Task StartAsync()
     {
         return _connection.StartAsync();
@@ -43,10 +48,13 @@ public abstract class BaseConnection : IAsyncDisposable, IClientConnection
 
     public Task HelloAsync()
     {
-        return _connection.SendAsync("Hello");
+        return _connection.SendAsync(nameof(IMainHubClientToServer.HelloAsync));
     }
 
-    public HubConnectionState State => _connection.State;
+    public Task AutoJoinMatchAsync(AutoJoinMatchInput input)
+    {
+        return _connection.SendAsync(nameof(IMainHubClientToServer.AutoJoinMatchAsync), input);
+    }
 
     private async Task<string?> GetAccessTokenAsync()
     {
@@ -56,23 +64,50 @@ public abstract class BaseConnection : IAsyncDisposable, IClientConnection
         using var httpClient = new HttpClient();
         var formContent = new FormUrlEncodedContent(new Dictionary<string, string>()
         {
-            {"grant_type", "password"},
-            {"scope", "offline_access OnlineServer"},
-            {"username", _userUserCredentials.Username},
-            {"password", _userUserCredentials.Password},
-            {"client_id", "OnlineServer_App"},
-            {"client_secret", ""}
+            { "grant_type", "password" },
+            { "scope", "offline_access OnlineServer" },
+            { "username", _userUserCredentials.Username },
+            { "password", _userUserCredentials.Password },
+            { "client_id", "OnlineServer_App" },
+            { "client_secret", "" }
         });
         var response = await httpClient.PostAsync(authEndpoint, formContent);
         if (response is not { IsSuccessStatusCode: true })
             return null;
         var responseContentStream = await response.Content.ReadAsStreamAsync();
         var getTokenOutput = JsonSerializer.Deserialize<GetTokenOutput>(responseContentStream);
-        
+
         return getTokenOutput?.AccessToken;
     }
 
     private void RegisterCallback()
     {
+        // NOTE: if don't want to use any callback, can comment it out to speed up
+        _connection.On(nameof(IMainHubServerToClient.HiAsync), () =>
+        {
+            _messageCallbackHandler.HiAsync();
+        });
+        _connection.On<string>(nameof(IMainHubServerToClient.ShowErrorAsync), (errorMessage) =>
+        {
+            _messageCallbackHandler.ShowErrorAsync(errorMessage);
+        });
+        _connection.On<GameMatchDto>(nameof(IMainHubServerToClient.MatchFoundAsync), (findMatchOutput) =>
+        {
+            _messageCallbackHandler.MatchFoundAsync(findMatchOutput);
+        });
+        _connection.On(nameof(IMainHubServerToClient.MultiLoginDetectedAsync), () =>
+        {
+            _messageCallbackHandler.MultiLoginDetectedAsync();
+            _connection.StopAsync();
+        });
+        _connection.On<MatchPlayersUpdateEventDto>(nameof(IMainHubServerToClient.UpdateMatchPlayersAsync), (eventDto) =>
+        {
+            _messageCallbackHandler.UpdateMatchPlayersAsync(eventDto);
+        });
+        _connection.On<MatchStateEventUpdateDto>(nameof(IMainHubServerToClient.UpdateMatchStateAsync), (eventDto) =>
+        {
+            _messageCallbackHandler.UpdateMatchStateAsync(eventDto);
+        });
+        //TODO: add new when have new event from server
     }
 }

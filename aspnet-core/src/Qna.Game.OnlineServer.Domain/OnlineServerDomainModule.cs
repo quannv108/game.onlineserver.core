@@ -1,6 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Qna.Game.OnlineServer.MultiTenancy;
+using Qna.Game.OnlineServer.Room.Managers;
+using Qna.Game.OnlineServer.Room.Storage;
+using Qna.Game.OnlineServer.Session.Storage;
 using Volo.Abp.AuditLogging;
 using Volo.Abp.BackgroundJobs;
 using Volo.Abp.Emailing;
@@ -64,5 +67,10 @@ public class OnlineServerDomainModule : AbpModule
 #if DEBUG
         context.Services.Replace(ServiceDescriptor.Singleton<IEmailSender, NullEmailSender>());
 #endif
+
+        context.Services.AddSingleton<IRoomStorage, RoomStorage>();
+        context.Services.AddSingleton<IUserConnectionSessionStorage, UserConnectionSessionStorage>();
+
+        context.Services.AddTransient<IRoomManager, RoomManager>();
     }
 }

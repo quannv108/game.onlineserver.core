@@ -149,7 +149,11 @@ public class OnlineServerSignalRHostModule : AbpModule
                 options.CustomSchemaIds(type => type.FullName);
                 options.AddSignalRSwaggerGen(options =>
                 {
-                    options.ScanAssemblies(typeof(OnlineServerSignalRModule).Assembly);
+                    options.ScanAssemblies(
+                        typeof(OnlineServerSignalRModule).Assembly,
+                        AppDomain.CurrentDomain.GetAssemblies()
+                            .Single(x => x.FullName.Contains("SignalR.Contracts")
+                    ));
                 });
             });
     }

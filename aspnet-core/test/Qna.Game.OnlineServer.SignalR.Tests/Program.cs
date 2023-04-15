@@ -14,17 +14,22 @@ builder.RegisterType<MessageCallbackHandler>().As<IMessageCallbackHandler>();
 builder.RegisterType<DummyClient>().As<DummyClient>();
 // end register implementation
 
-var Container = builder.Build();
+var container = builder.Build();
 
-await using var scope = Container.BeginLifetimeScope();
+await using var scope = container.BeginLifetimeScope();
+
+// create connection with server
 Console.WriteLine("start dummy client");
 await using var client = scope.Resolve<DummyClient>();
 await client.StartAsync();
-await client.HelloAsync();
 
+// try to send a message
+client.SayHelloAsync();
+
+// keep it run until connection dropped
 while (client.State != HubConnectionState.Disconnected)
 {
     Console.WriteLine(client.State.ToString());
     Thread.Sleep(2000);
 }
-Console.Write("stop");
+Console.Write("stopped");

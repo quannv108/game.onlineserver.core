@@ -3,7 +3,7 @@ using Qna.Game.OnlineServer.Test;
 using SignalRSwaggerGen.Attributes;
 using Volo.Abp.AspNetCore.SignalR;
 
-namespace Qna.Game.OnlineServer.SignalR.Test;
+namespace Qna.Game.OnlineServer.SignalR.Hub.Test;
 
 [SignalRHub]
 public class TestHub : AbpHub

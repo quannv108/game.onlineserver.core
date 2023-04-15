@@ -45,6 +45,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Qna.Game.OnlineServer.Signa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Qna.Game.OnlineServer.SignalR.Tests", "test\Qna.Game.OnlineServer.SignalR.Tests\Qna.Game.OnlineServer.SignalR.Tests.csproj", "{088C7571-B1CD-4F6D-93EF-E587AC4D65FE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Qna.Game.OnlineServer.SignalR.Tests2", "test\Qna.Game.OnlineServer.SignalR.Tests2\Qna.Game.OnlineServer.SignalR.Tests2.csproj", "{A04E56B8-943E-4F2C-8347-A35A5C6417DE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -127,6 +129,10 @@ Global
 		{088C7571-B1CD-4F6D-93EF-E587AC4D65FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{088C7571-B1CD-4F6D-93EF-E587AC4D65FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{088C7571-B1CD-4F6D-93EF-E587AC4D65FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A04E56B8-943E-4F2C-8347-A35A5C6417DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A04E56B8-943E-4F2C-8347-A35A5C6417DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A04E56B8-943E-4F2C-8347-A35A5C6417DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A04E56B8-943E-4F2C-8347-A35A5C6417DE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -151,6 +157,7 @@ Global
 		{02EBA300-D430-4633-81F2-2065190C33F5} = {CA9AC87F-097E-4F15-8393-4BC07735A5B0}
 		{FF8495CE-EC62-43B3-A1A1-8D0A2D2A7720} = {CA9AC87F-097E-4F15-8393-4BC07735A5B0}
 		{088C7571-B1CD-4F6D-93EF-E587AC4D65FE} = {04DBDB01-70F4-4E06-B468-8F87850B22BE}
+		{A04E56B8-943E-4F2C-8347-A35A5C6417DE} = {04DBDB01-70F4-4E06-B468-8F87850B22BE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {28315BFD-90E7-4E14-A2EA-F3D23AF4126F}

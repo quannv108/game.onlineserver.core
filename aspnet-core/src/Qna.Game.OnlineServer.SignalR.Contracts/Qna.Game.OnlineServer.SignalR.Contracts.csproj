@@ -9,7 +9,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Main" />
+      <ProjectReference Include="..\Qna.Game.OnlineServer.Domain.Shared\Qna.Game.OnlineServer.Domain.Shared.csproj" />
     </ItemGroup>
 
 </Project>

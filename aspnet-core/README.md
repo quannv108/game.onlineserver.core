@@ -79,3 +79,5 @@ To run docker, use these command
 > docker run -p 44325:443 --name api -d public.ecr.aws/a9z0m0c0/gameonline-api:latest
 >
 > docker run -p 44335:443 --name signalr -d public.ecr.aws/a9z0m0c0/gameonline-signalr:latest
+
+TODO: current ssl certificate only able to use on local. Need to create certificate for AWS EC2 domain

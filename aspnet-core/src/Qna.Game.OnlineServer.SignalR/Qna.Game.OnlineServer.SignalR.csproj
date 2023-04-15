@@ -2,20 +2,27 @@
 
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
-        <Nullable>enable</Nullable>
+        <Nullable>disable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <OutputType>Library</OutputType>
         <LangVersion>latest</LangVersion>
+        <RootNamespace>Qna.Game.OnlineServer.SignalR</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="SignalRSwaggerGen" Version="4.2.0" />
       <PackageReference Include="Volo.Abp.AspNetCore.SignalR" Version="7.1.1" />
       <PackageReference Include="Volo.Abp.Core" Version="7.1.1" />
+      <PackageReference Include="Volo.Abp.Ddd.Application" Version="7.1.1" />
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Qna.Game.OnlineServer.Domain\Qna.Game.OnlineServer.Domain.csproj" />
       <ProjectReference Include="..\Qna.Game.OnlineServer.SignalR.Contracts\Qna.Game.OnlineServer.SignalR.Contracts.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Game" />
     </ItemGroup>
 
 </Project>
