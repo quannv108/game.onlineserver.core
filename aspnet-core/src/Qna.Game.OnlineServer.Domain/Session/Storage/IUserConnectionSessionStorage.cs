@@ -8,7 +8,6 @@ public interface IUserConnectionSessionStorage : ISingletonDependency
     UserConnectionSession GetByUserId(Guid userId);
 
     UserConnectionSession Delete(Guid userId, string connectionId);
-    void Update(UserConnectionSession session);
-    void Create(UserConnectionSession session);
     int Count();
+    void CreateOrUpdate(UserConnectionSession session);
 }

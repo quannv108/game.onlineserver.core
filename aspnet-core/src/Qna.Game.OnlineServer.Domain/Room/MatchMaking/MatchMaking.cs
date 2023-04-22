@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
-using Qna.Game.OnlineServer.InGame;
+using Qna.Game.OnlineServer.GamePlay;
+using Qna.Game.OnlineServer.GamePlay.Players;
 using Qna.Game.OnlineServer.Room.Helpers;
 using Qna.Game.OnlineServer.Room.Storage;
 using Qna.Game.OnlineServer.Session;
@@ -16,9 +17,9 @@ public class MatchMaking : IMatchMaking
         _roomStorage = roomStorage;
     }
 
-    public Task<(string, Room)> FindMatchAsync(UserConnectionSession userConnectionSession)
+    public Task<(string, Room)> FindMatchAsync(UserConnectionSession userConnectionSession, long gameId)
     {
-        var conditionKey = GetConditionKey(userConnectionSession.CurrentPlayer);
+        var conditionKey = GetConditionKey(userConnectionSession.CurrentPlayer, gameId);
 
         var joinableMatchs = _roomStorage.GetAll(conditionKey)
             .Where(x => x.CanJoinForPlay(1))
@@ -26,13 +27,8 @@ public class MatchMaking : IMatchMaking
         return Task.FromResult((conditionKey, joinableMatchs.FirstOrDefault()));
     }
 
-    public string GetConditionKey(Room room)
+    public string GetConditionKey(GamePlayer player, long gameId)
     {
-        return GetConditionKey(room.Players.First());
-    }
-
-    private static string GetConditionKey(GamePlayer player)
-    {
-        return player.CurrentLevel.ToString();
+        return $"{gameId}_{player.CurrentLevel.ToString()}";
     }
 }

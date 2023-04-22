@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Qna.Game.OnlineServer.GamePlay;
 using Qna.Game.OnlineServer.MultiTenancy;
-using Qna.Game.OnlineServer.Room.Managers;
 using Qna.Game.OnlineServer.Room.Storage;
 using Qna.Game.OnlineServer.Session.Storage;
 using Volo.Abp.AuditLogging;
@@ -71,6 +71,8 @@ public class OnlineServerDomainModule : AbpModule
         context.Services.AddSingleton<IRoomStorage, RoomStorage>();
         context.Services.AddSingleton<IUserConnectionSessionStorage, UserConnectionSessionStorage>();
 
-        context.Services.AddTransient<IRoomManager, RoomManager>();
+        context.Services.AddTransient<IGameLoop<GamePlay.TicTacToe.Models.GamePlayData,
+                GamePlay.TicTacToe.TicTacToeGameState>,
+            GamePlay.TicTacToe.GameLoop>();
     }
 }

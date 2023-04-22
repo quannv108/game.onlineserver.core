@@ -1,15 +1,20 @@
+using Microsoft.AspNetCore.SignalR;
 using Qna.Game.OnlineServer.Session;
 using Qna.Game.OnlineServer.Session.Events;
 using Qna.Game.OnlineServer.Session.Managers;
-using Qna.Game.OnlineServer.SignalR.Hub.Main;
+using Qna.Game.OnlineServer.SignalR.Contracts.Hub.Core;
+using Qna.Game.OnlineServer.SignalR.Hub.Core;
 using Volo.Abp;
+using Volo.Abp.AspNetCore.SignalR;
 using Volo.Abp.EventBus;
 
 namespace Qna.Game.OnlineServer.SignalR.Session;
 
-[RemoteService(IsMetadataEnabled = false)]
-public class SessionService : MainHubAppService, ISessionService,
+[RemoteService(false)]
+public class SessionService<THub, TClientAction> : SignalRServiceBase<THub, TClientAction>, ISessionService, 
     ILocalEventHandler<UserSessionRemovedEvent>
+    where THub : AbpHub<TClientAction>
+    where TClientAction : class, IHubClientActionBase
 {
     private readonly IUserConnectionSessionManager _userConnectionSessionManager;
 
@@ -36,7 +41,8 @@ public class SessionService : MainHubAppService, ISessionService,
     {
         _userConnectionSessionManager.DeleteAsync(userId, connectionId);
     }
-
+    
+    
     public Task HandleEventAsync(UserSessionRemovedEvent eventData)
     {
         Logger.LogDebug($"SessionService: UserSessionRemovedEvent: {eventData.UserId}, " +

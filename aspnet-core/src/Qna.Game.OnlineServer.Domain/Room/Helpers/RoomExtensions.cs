@@ -15,8 +15,8 @@ public static class RoomExtensions
         return room.TotalCurrentPlayers == room.MaxPlayablePlayer;
     }
 
-    public static string GetRoomName(this Room match)
+    public static string GetRoomName(this Room room)
     {
-        return match.Id.ToString();
+        return $"{room.GameId}_{room.Id}";
     }
 }

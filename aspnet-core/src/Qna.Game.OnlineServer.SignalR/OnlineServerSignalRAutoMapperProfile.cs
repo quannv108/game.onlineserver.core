@@ -1,5 +1,6 @@
 using AutoMapper;
-using Qna.Game.OnlineServer.InGame;
+using Qna.Game.OnlineServer.GamePlay;
+using Qna.Game.OnlineServer.GamePlay.Players;
 using Qna.Game.OnlineServer.SignalR.Contracts.Match;
 using Qna.Game.OnlineServer.SignalR.Contracts.Users;
 
@@ -12,7 +13,8 @@ public class OnlineServerSignalRAutoMapperProfile : Profile
         /* You can configure your AutoMapper mapping configuration here.
          * Alternatively, you can split your mapping configurations
          * into multiple profile classes for a better organization. */
-        CreateMap<Room.Room, GameMatchDto>();
+        CreateMap<Room.Room, GameMatchDto>()
+            .ForMember(x => x.Players, y => y.MapFrom(z => z.Players.ToList()));
         CreateMap<GamePlayer, GamePlayerDto>();
     }
 }

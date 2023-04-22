@@ -1,4 +1,5 @@
-using Qna.Game.OnlineServer.Room.Storage;
+using Qna.Game.OnlineServer.SignalR.Contracts.Hub.TicTacToe;
+using Qna.Game.OnlineServer.SignalR.Hub.TicTacToe;
 using Qna.Game.OnlineServer.SignalR.Match;
 using Qna.Game.OnlineServer.SignalR.Session;
 using Volo.Abp.AspNetCore.SignalR;
@@ -19,9 +20,14 @@ public class OnlineServerSignalRModule : AbpModule
         {
             options.AddMaps<OnlineServerSignalRModule>();
         });
-        
-        // context.Services.AddSingleton<IMatchService, MatchService>();
-        // context.Services.AddSingleton<ISessionService, SessionService>();
+
+        #region TicTacToe
+
+        context.Services.AddSingleton<MatchService<Hub.TicTacToe.TicTacToeHub, ITicTacToeClientAction>>();
+        context.Services.AddSingleton<SessionService<Hub.TicTacToe.TicTacToeHub, ITicTacToeClientAction>>();
+        context.Services.AddSingleton<GamePlay.TicTacToe.IGamePlayService, GamePlay.TicTacToe.GamePlayService>();
+
+        #endregion
     }
     
     

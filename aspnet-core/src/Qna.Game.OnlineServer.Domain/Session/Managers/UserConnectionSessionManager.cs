@@ -1,7 +1,8 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Qna.Game.OnlineServer.InGame;
+using Qna.Game.OnlineServer.GamePlay;
+using Qna.Game.OnlineServer.GamePlay.Players;
 using Qna.Game.OnlineServer.Session.Events;
 using Qna.Game.OnlineServer.Session.Storage;
 using Volo.Abp;
@@ -34,22 +35,20 @@ public class UserConnectionSessionManager : DomainService, IUserConnectionSessio
         };
 
         var existing = _userConnectionSessionStorage.GetByUserId(userId);
+        _userConnectionSessionStorage.CreateOrUpdate(session);
         if (existing != null)
         {
-            _userConnectionSessionStorage.Update(session);
             Logger.LogInformation($"session of user {session.UserId} has been updated");
-            
-            // don't need to await
-            _localEventBus.PublishAsync(new UserSessionRemovedEvent
+
+            await Task.Run(() => _localEventBus.PublishAsync(new UserSessionRemovedEvent
             {
                 UserId = userId,
                 ConnectionId = existing.ConnectionId,
                 Reason = ConnectionSessionDestroyReason.MultiSession
-            });
+            }, false));
         }
         else
         {
-            _userConnectionSessionStorage.Create(session);
             Logger.LogInformation($"new session for user {session.UserId} has been created");
         }
 
@@ -70,12 +69,14 @@ public class UserConnectionSessionManager : DomainService, IUserConnectionSessio
     {
         var session = _userConnectionSessionStorage.Delete(userId, connectionId);
         if (session != null)
+        {
             await _localEventBus.PublishAsync(new UserSessionRemovedEvent
             {
                 UserId = userId,
                 ConnectionId = session.ConnectionId,
                 Reason = ConnectionSessionDestroyReason.UnSpecific
-            });
+            }, false);
+        }
     }
 
     public Task<int> GetTotalSessionCountAsync()

@@ -3,6 +3,8 @@
 using Autofac;
 using Microsoft.AspNetCore.SignalR.Client;
 using Qna.Game.OnlineServer.SignalR.Client.Client;
+using Qna.Game.OnlineServer.SignalR.Client.Client.Core;
+using Qna.Game.OnlineServer.SignalR.Client.Client.TicTacToe;
 using Qna.Game.OnlineServer.SignalR.Tests;
 
 Console.WriteLine("Hello, World!");
@@ -10,8 +12,8 @@ Console.WriteLine("Hello, World!");
 var builder = new ContainerBuilder();
 
 // begin register implementation
-builder.RegisterType<MessageCallbackHandler>().As<IMessageCallbackHandler>();
-builder.RegisterType<DummyClient>().As<DummyClient>();
+builder.RegisterType<MessageCallbackHandler>().As<ITicTacToeCallbackHandler>();
+builder.RegisterType<TicTacToeClient>().As<TicTacToeClient>();
 // end register implementation
 
 var container = builder.Build();
@@ -20,7 +22,7 @@ await using var scope = container.BeginLifetimeScope();
 
 // create connection with server
 Console.WriteLine("start dummy client");
-await using var client = scope.Resolve<DummyClient>();
+await using var client = scope.Resolve<TicTacToeClient>();
 await client.StartAsync();
 
 // try to send a message

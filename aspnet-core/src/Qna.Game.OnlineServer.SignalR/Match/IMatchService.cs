@@ -5,5 +5,6 @@ namespace Qna.Game.OnlineServer.SignalR.Match;
 
 public interface IMatchService : IApplicationService
 {
-    Task<Room.Room> AutoJoinAsync(UserConnectionSession session);
+    Task<Room.Room> AutoJoinAsync(UserConnectionSession session, long gameId);
+    Task LeaveMatchAsync(UserConnectionSession session);
 }

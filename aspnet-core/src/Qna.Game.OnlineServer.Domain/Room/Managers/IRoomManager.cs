@@ -8,11 +8,12 @@ namespace Qna.Game.OnlineServer.Room.Managers;
 
 public interface IRoomManager : IDomainService
 {
-    Task<Room> CreateAsync(UserConnectionSession hostUser);
-    Task<Room> AutoJoinOrCreateAsync(UserConnectionSession session);
+    Task<Room> CreateAsync(UserConnectionSession hostUser, long gameId);
+    Task<Room> AutoJoinOrCreateAsync(UserConnectionSession session, long gameId);
     Task DeleteAsync(Room room);
-    Task AddPlayer(Room room, UserConnectionSession userConnectionSession);
-    Task RemovePlayer(Room room, Guid userId, string connectionId);
-    List<Room> GetAllAsync(Guid userId);
+    Task AddPlayerAsync(Room room, UserConnectionSession userConnectionSession);
+    Task RemovePlayerAsync(Room room, Guid userId, string connectionId);
+    List<Room> GetAll(Guid userId);
     Room Get(Guid roomId);
+    Task UpdateRoomStateAsync(Room room);
 }

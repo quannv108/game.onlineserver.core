@@ -52,6 +52,12 @@ public class OnlineServerDbContext :
 
     #endregion
 
+    #region Entities
+
+    public DbSet<Game.Game> Games { get; set; }
+
+    #endregion
+
     public OnlineServerDbContext(DbContextOptions<OnlineServerDbContext> options)
         : base(options)
     {

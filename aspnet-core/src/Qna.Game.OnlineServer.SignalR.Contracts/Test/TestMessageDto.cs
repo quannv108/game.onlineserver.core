@@ -1,4 +1,4 @@
-namespace Qna.Game.OnlineServer.Test;
+namespace Qna.Game.OnlineServer.SignalR.Contracts.Test;
 
 public class TestMessageDto
 {

@@ -1,26 +1,28 @@
 using Microsoft.AspNetCore.SignalR;
-using Qna.Game.OnlineServer.Game;
-using Qna.Game.OnlineServer.InGame;
+using Qna.Game.OnlineServer.GamePlay.Players;
 using Qna.Game.OnlineServer.Room.Events;
 using Qna.Game.OnlineServer.Room.Helpers;
 using Qna.Game.OnlineServer.Room.Managers;
 using Qna.Game.OnlineServer.Session;
 using Qna.Game.OnlineServer.Session.Events;
+using Qna.Game.OnlineServer.SignalR.Contracts.Hub.Core;
 using Qna.Game.OnlineServer.SignalR.Contracts.Match;
 using Qna.Game.OnlineServer.SignalR.Contracts.Match.Events;
 using Qna.Game.OnlineServer.SignalR.Contracts.Users;
-using Qna.Game.OnlineServer.SignalR.Hub.Main;
 using Volo.Abp;
 using Volo.Abp.EventBus;
 
 namespace Qna.Game.OnlineServer.SignalR.Match;
 
-[RemoteService(IsMetadataEnabled = false)]
-public class MatchService : MainHubAppService, IMatchService,
+[RemoteService(false)]
+public class MatchService<THub, TClientAction> : SignalRServiceBase<THub, TClientAction>,
+    IMatchService,
     ILocalEventHandler<UserSessionRemovedEvent>,
     ILocalEventHandler<RoomPlayerAddedEvent>,
     ILocalEventHandler<RoomPlayerRemovedEvent>,
     ILocalEventHandler<RoomStateChangedEvent>
+    where THub : Hub<TClientAction>
+    where TClientAction : class, IHubClientActionBase
 {
     private readonly IRoomManager _roomManager;
 
@@ -29,32 +31,40 @@ public class MatchService : MainHubAppService, IMatchService,
     {
         _roomManager = roomManager;
     }
-    
-    public async Task<Room.Room> AutoJoinAsync(UserConnectionSession session)
+
+    public async Task<Room.Room> AutoJoinAsync(UserConnectionSession session, long gameId)
     {
         if (session.CurrentMatch != null)
         {
             throw new UserFriendlyException("existing in a match already");
         }
-        var match = await _roomManager.AutoJoinOrCreateAsync(session);
+
+        var match = await _roomManager.AutoJoinOrCreateAsync(session, gameId);
         session.CurrentMatch = match;
-        Logger.LogDebug($"user {session.UserId} will join room {match.Id}");
 
         var matchDto = ObjectMapper.Map<Room.Room, GameMatchDto>(match);
         await GetClient(session.ConnectionId).MatchFoundAsync(matchDto);
-        
+
         return match;
+    }
+
+    public async Task LeaveMatchAsync(UserConnectionSession session)
+    {
+        var match = session.CurrentMatch;
+        await _roomManager.RemovePlayerAsync(match, session.UserId, session.ConnectionId);
+        session.CurrentMatch = null;
     }
 
     public Task HandleEventAsync(UserSessionRemovedEvent eventData)
     {
         var userId = eventData.UserId;
-        var matchs = _roomManager.GetAllAsync(userId);
-        Logger.LogDebug($"MatchService: UserSessionRemovedEvent: {eventData.UserId}, " +
-                        $"old connectionId = {eventData.ConnectionId}, appear in {matchs.Count} matchs");
+        var matchs = _roomManager.GetAll(userId);
+        Logger.LogDebug($"MatchService: UserSessionRemovedEvent: userId = {eventData.UserId}, " +
+                        $"old connectionId = {eventData.ConnectionId}, existing in {matchs.Count} room");
         foreach (var m in matchs)
         {
-            _roomManager.RemovePlayer(m, userId, eventData.ConnectionId);
+            _roomManager.RemovePlayerAsync(m, userId, eventData.ConnectionId); // this line should be on SessionManager
+
             var roomName = m.GetRoomName();
             Groups.RemoveFromGroupAsync(eventData.ConnectionId, roomName);
         }
@@ -70,9 +80,9 @@ public class MatchService : MainHubAppService, IMatchService,
         await Clients.Groups(roomName)
             .UpdateMatchPlayersAsync(new MatchPlayersUpdateEventDto
             {
-                Players = ObjectMapper.Map<List<GamePlayer>, List<GamePlayerDto>>(room.Players)
+                Players = ObjectMapper.Map<List<GamePlayer>, List<GamePlayerDto>>(room.Players.ToList())
             });
-        
+
         await Groups.AddToGroupAsync(eventData.NewPlayerConnectionId, roomName);
     }
 
@@ -80,26 +90,20 @@ public class MatchService : MainHubAppService, IMatchService,
     {
         var room = _roomManager.Get(eventData.RoomId);
         var roomName = room.GetRoomName();
-        
+
         await Groups.RemoveFromGroupAsync(eventData.RemovedPlayerConnectionId, roomName);
         await Clients.Groups(roomName).UpdateMatchPlayersAsync(new MatchPlayersUpdateEventDto
         {
-            Players = ObjectMapper.Map<List<GamePlayer>, List<GamePlayerDto>>(room.Players)
+            Players = ObjectMapper.Map<List<GamePlayer>, List<GamePlayerDto>>(room.Players.ToList())
         });
     }
 
-    public async Task HandleEventAsync(RoomStateChangedEvent eventData)
+    public Task HandleEventAsync(RoomStateChangedEvent eventData)
     {
-        await Clients.Groups(eventData.RoomName)
+        return Clients.Groups(eventData.RoomName)
             .UpdateMatchStateAsync(new MatchStateEventUpdateDto()
             {
                 State = eventData.NewState
             });
-
-        if (eventData.NewState == RoomState.ReadyForPlay)
-        {
-            // start game
-            // _gameService.Start(match);
-        }
     }
 }

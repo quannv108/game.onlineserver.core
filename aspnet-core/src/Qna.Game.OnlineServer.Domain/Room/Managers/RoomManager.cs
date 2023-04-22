@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Qna.Game.OnlineServer.Game;
+using Qna.Game.OnlineServer.Game.Managers;
+using Qna.Game.OnlineServer.GamePlay.Managers;
 using Qna.Game.OnlineServer.Room.Events;
 using Qna.Game.OnlineServer.Room.Helpers;
 using Qna.Game.OnlineServer.Room.MatchMaking;
@@ -21,6 +23,9 @@ public class RoomManager : DomainService, IRoomManager
     private readonly IRoomStorage _roomStorage;
     private readonly ILocalEventBus _localEventBus;
 
+    private IGameManager GameManager => LazyServiceProvider.LazyGetRequiredService<IGameManager>();
+    private IGamePlayManager GamePlayManager => LazyServiceProvider.LazyGetRequiredService<IGamePlayManager>();
+
     public RoomManager(IRoomStateMachine roomStateMachine,
         IMatchMaking matchMaking,
         IRoomStorage roomStorage,
@@ -32,87 +37,90 @@ public class RoomManager : DomainService, IRoomManager
         _localEventBus = localEventBus;
     }
     
-    public Task<Room> CreateAsync(UserConnectionSession hostUser)
+    public async Task<Room> CreateAsync(UserConnectionSession hostUser, long gameId)
     {
-        var room = new Room(hostUser)
+        var room = new Room
         {
             State = RoomState.Matching,
-            MaxPlayablePlayer = 2
+            MaxPlayablePlayer = 2, // TODO: bring this to Game.Game Entity
+            GameId = gameId,
+            ConditionKey = _matchMaking.GetConditionKey(hostUser.CurrentPlayer, gameId)
         };
         
-        _roomStorage.Add(_matchMaking.GetConditionKey(room), room);
-        Logger.LogDebug($"user {hostUser.UserId} host new match {room.Id}");
+        _roomStorage.Add(room.ConditionKey, room);
+        Logger.LogDebug($"user {hostUser.UserId} create new room {room.Id}");
         
-        _localEventBus.PublishAsync(new RoomCreatedEvent
+        await _localEventBus.PublishAsync(new RoomCreatedEvent
         {
             RoomId = room.Id,
             RoomName = room.GetRoomName()
-        });
-        return Task.FromResult(room);
+        }, false);
+        
+        await AddPlayerAsync(room, hostUser);
+        return room;
     }
 
-    public async Task<Room> AutoJoinOrCreateAsync(UserConnectionSession session)
+    public async Task<Room> AutoJoinOrCreateAsync(UserConnectionSession session, long gameId)
     {
-        var (conditionKey, room) = await _matchMaking.FindMatchAsync(session);
+        var (_, room) = await _matchMaking.FindMatchAsync(session, gameId);
         if (room != null)
         {
-            Logger.LogDebug($"user {session.UserId} found match {room.Id} still has slots to join");
-            await AddPlayer(room, session);
+            Logger.LogDebug($"user {session.UserId} found room {room.Id} has slots to join");
+            await AddPlayerAsync(room, session);
             return room;
         }
 
-        var newMatch = await CreateAsync(session);
-        return newMatch;
+        return await CreateAsync(session, gameId);
     }
 
     public Task DeleteAsync(Room room)
     {
-        var conditionKey = _matchMaking.GetConditionKey(room);
+        var conditionKey = room.ConditionKey;
         _roomStorage.Delete(conditionKey, room.Id);
-        _localEventBus.PublishAsync(new RoomDestroyedEvent
+        Logger.LogDebug($"room {room.Id} destroyed");
+        
+        return _localEventBus.PublishAsync(new RoomDestroyedEvent
         {
             RoomId = room.Id
-        });
-        return Task.CompletedTask;
+        }, false);
     }
 
-    public async Task AddPlayer(Room room, UserConnectionSession userConnectionSession)
+    public Task AddPlayerAsync(Room room, UserConnectionSession userConnectionSession)
     {
         room.Players.Add(userConnectionSession.CurrentPlayer);
-        
-        await _localEventBus.PublishAsync(new RoomPlayerAddedEvent
+        Logger.LogDebug($"room {room.Id} add new user {userConnectionSession.UserId}");
+
+        // no await
+        _localEventBus.PublishAsync(new RoomPlayerAddedEvent
         {
             RoomId = room.Id,
             NewPlayerConnectionId = userConnectionSession.ConnectionId
-        });
+        }, false);
 
-        var roomStateChanged = _roomStateMachine.ProcessState(room);
-        if (roomStateChanged)
-        {
-            await _localEventBus.PublishAsync(new RoomStateChangedEvent
-            {
-                RoomId = room.Id,
-                RoomName = room.GetRoomName(),
-                NewState = room.State
-            });
-        }
+        return UpdateRoomStateAsync(room);
     }
 
-    public async Task RemovePlayer(Room room, Guid userId, string connectionId)
-    {
+    public Task RemovePlayerAsync(Room room, Guid userId, string connectionId)
+    {   
         var count = room.Players.RemoveAll(x => x.UserId == userId);
+        Logger.LogDebug($"room {room.Id} remove user {userId}: {count}");
+        
         if (count != 0)
         {
-            await _localEventBus.PublishAsync(new RoomPlayerRemovedEvent
+            // no await
+            _localEventBus.PublishAsync(new RoomPlayerRemovedEvent
             {
                 RoomId = room.Id,
                 RemovedPlayerConnectionId = connectionId
-                
-            });
+            }, false);
+            
+            UpdateRoomStateAsync(room);
         }
+
+        return Task.CompletedTask;
     }
 
-    public List<Room> GetAllAsync(Guid userId)
+    public List<Room> GetAll(Guid userId)
     {
         return _roomStorage.GetAll(userId);
     }
@@ -120,5 +128,64 @@ public class RoomManager : DomainService, IRoomManager
     public Room Get(Guid roomId)
     {
         return _roomStorage.Get(roomId);
+    }
+
+    public Task UpdateRoomStateAsync(Room room)
+    {
+        var roomStateChanged = _roomStateMachine.ProcessState(room);
+        if (!roomStateChanged)
+        {
+            return Task.CompletedTask;
+        }
+
+        Logger.LogDebug($"Room {room.Id} change status to {room.State.ToString()}");
+        _localEventBus.PublishAsync(new RoomStateChangedEvent
+        {
+            RoomId = room.Id,
+            RoomName = room.GetRoomName(),
+            NewState = room.State
+        }, false);
+        
+        // data changed depend on new state
+        // no await
+        return UpdateGameBaseOnRoomStateChangedAsync(room);
+    }
+
+    private async Task UpdateGameBaseOnRoomStateChangedAsync(Room room)
+    {
+        switch (room.State)
+        {
+            case RoomState.ReadyForPlay:
+            {
+                // TODO: below logic should be run on GameManager
+                // start game
+                var gameInfo = await GameManager.GetAsync(room.GameId);
+                GamePlayManager.CreateAndStartGameLoop(gameInfo, room);
+
+                // update room state
+                await UpdateRoomStateAsync(room);
+                break;
+            }
+            case RoomState.Ended:
+            {
+                // TODO: scoring update
+                // TODO: leaderboard update
+                // TODO: user statistic update
+
+                // clean up & change state
+                room.GameLoop = null;
+                RemoveRoomIfNoPlayerAndGameEnded(room);
+
+                break;
+            }
+        }
+    }
+
+    private void RemoveRoomIfNoPlayerAndGameEnded(Room room)
+    {
+        if (room.State == RoomState.Ended && room.TotalCurrentPlayers == 0)
+        {
+            DeleteAsync(room);
+        }
     }
 }

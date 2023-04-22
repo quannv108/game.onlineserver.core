@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
-using Qna.Game.OnlineServer.InGame;
+using Qna.Game.OnlineServer.GamePlay;
+using Qna.Game.OnlineServer.GamePlay.Players;
 
 namespace Qna.Game.OnlineServer.Session;
 

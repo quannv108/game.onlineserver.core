@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.SignalR;
-using Qna.Game.OnlineServer.Test;
+using Qna.Game.OnlineServer.SignalR.Contracts.Test;
 using SignalRSwaggerGen.Attributes;
 using Volo.Abp.AspNetCore.SignalR;
 

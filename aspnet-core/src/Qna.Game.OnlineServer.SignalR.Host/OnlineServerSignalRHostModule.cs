@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Extensions.DependencyInjection;
@@ -22,12 +21,9 @@ using Volo.Abp.Swashbuckle;
 using Volo.Abp.UI.Navigation.Urls;
 using Volo.Abp.VirtualFileSystem;
 // using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Http;
 using Qna.Game.OnlineServer.MultiTenancy;
-using Volo.Abp.Account.Web;
-using Volo.Abp.AspNetCore.MultiTenancy;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.Shared;
-using Volo.Abp.AspNetCore.SignalR;
+using Volo.Abp.OpenIddict;
 
 namespace Qna.Game.OnlineServer;
 
@@ -39,7 +35,7 @@ namespace Qna.Game.OnlineServer;
     // typeof(OnlineServerApplicationModule),
     typeof(OnlineServerEntityFrameworkCoreModule),
     // typeof(AbpAspNetCoreMvcUiLeptonXLiteThemeModule),
-    typeof(AbpAccountWebOpenIddictModule),
+    typeof(AbpOpenIddictAspNetCoreModule),
     typeof(AbpAspNetCoreSerilogModule),
     typeof(AbpSwashbuckleModule)
 )]

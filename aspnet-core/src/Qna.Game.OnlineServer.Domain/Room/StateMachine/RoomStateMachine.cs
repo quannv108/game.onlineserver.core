@@ -18,7 +18,20 @@ public class RoomStateMachine : DomainService, IRoomStateMachine
                     return true;
                 }
                 break;
+            case RoomState.ReadyForPlay:
+                if (match.GameLoop != null)
+                {
+                    match.State = RoomState.Playing;
+                    return true;
+                }
+                break;
             case RoomState.Playing:
+                // wait until all player leave
+                if (match.TotalCurrentPlayers == 0)
+                {
+                    match.State = RoomState.Ended;
+                    return true;
+                }
                 break;
             case RoomState.Ended:
                 break;
