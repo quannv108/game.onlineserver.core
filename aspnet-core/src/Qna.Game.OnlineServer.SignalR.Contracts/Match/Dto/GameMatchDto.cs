@@ -1,4 +1,5 @@
 using Qna.Game.OnlineServer.Game;
+using Qna.Game.OnlineServer.Match;
 using Qna.Game.OnlineServer.SignalR.Contracts.Users;
 
 namespace Qna.Game.OnlineServer.SignalR.Contracts.Match;

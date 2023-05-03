@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Qna.Game.OnlineServer.Friendship;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.Data;
@@ -52,7 +53,13 @@ public class OnlineServerDbContext :
 
     #endregion
 
-    #region Entities
+    #region Features
+
+    public DbSet<FriendshipInvitation> FriendRequestInvitations { get; set; }
+
+    #endregion
+    
+    #region Game
 
     public DbSet<Game.Game> Games { get; set; }
 

@@ -41,8 +41,7 @@ public class SessionService<THub, TClientAction> : SignalRServiceBase<THub, TCli
     {
         _userConnectionSessionManager.DeleteAsync(userId, connectionId);
     }
-    
-    
+
     public Task HandleEventAsync(UserSessionRemovedEvent eventData)
     {
         Logger.LogDebug($"SessionService: UserSessionRemovedEvent: {eventData.UserId}, " +

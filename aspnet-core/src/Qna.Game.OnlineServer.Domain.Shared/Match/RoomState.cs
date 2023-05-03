@@ -1,4 +1,4 @@
-namespace Qna.Game.OnlineServer.Game;
+namespace Qna.Game.OnlineServer.Match;
 
 public enum RoomState
 {
