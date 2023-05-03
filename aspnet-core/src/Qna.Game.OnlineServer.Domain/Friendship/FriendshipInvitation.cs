@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 using Qna.Game.OnlineServer.Schema;
@@ -15,6 +16,7 @@ public class FriendshipInvitation : FullAuditedEntity<Guid>
     public Guid ToUserId { get; set; }
     public IdentityUser ToUser { get; set; }
     
+    [MaxLength(FriendshipInvitationConsts.MessageMaxLength)]
     public string Message { get; set; }
     public FriendRequestInvitationStatus Status { get; set; }
 }

@@ -1,7 +1,7 @@
 using System;
 using Volo.Abp.Users;
 
-namespace Qna.Game.OnlineServer.Core;
+namespace Qna.Game.OnlineServer.Core.Users;
 
 public static class ICurrentUserExtensions
 {

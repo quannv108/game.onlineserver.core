@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Qna.Game.OnlineServer.Core;
+using Qna.Game.OnlineServer.Core.Users;
 using Qna.Game.OnlineServer.Friendship.Dto;
 using Qna.Game.OnlineServer.Friendship.Managers;
 

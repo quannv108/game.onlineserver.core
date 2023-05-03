@@ -21,8 +21,4 @@
       <ProjectReference Include="..\Qna.Game.OnlineServer.SignalR.Contracts\Qna.Game.OnlineServer.SignalR.Contracts.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Game" />
-    </ItemGroup>
-
 </Project>

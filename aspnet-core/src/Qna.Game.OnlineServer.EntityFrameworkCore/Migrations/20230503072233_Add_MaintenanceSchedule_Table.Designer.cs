@@ -13,8 +13,8 @@ using Volo.Abp.EntityFrameworkCore;
 namespace Qna.Game.OnlineServer.Migrations
 {
     [DbContext(typeof(OnlineServerDbContext))]
-    [Migration("20230503031049_Create_FriendshipInvitation")]
-    partial class CreateFriendshipInvitation
+    [Migration("20230503072233_Add_MaintenanceSchedule_Table")]
+    partial class AddMaintenanceScheduleTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -66,7 +66,8 @@ namespace Qna.Game.OnlineServer.Migrations
                         .HasColumnName("LastModifierId");
 
                     b.Property<string>("Message")
-                        .HasColumnType("text");
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
 
                     b.Property<int>("Status")
                         .HasColumnType("integer");
@@ -95,7 +96,8 @@ namespace Qna.Game.OnlineServer.Migrations
                         .HasColumnType("boolean");
 
                     b.Property<string>("Name")
-                        .HasColumnType("text");
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
 
                     b.Property<int>("Type")
                         .HasColumnType("integer");
@@ -105,6 +107,32 @@ namespace Qna.Game.OnlineServer.Migrations
                     b.HasIndex("IsActive");
 
                     b.ToTable("Game", "Game");
+                });
+
+            modelBuilder.Entity("Qna.Game.OnlineServer.Maintenance.MaintenanceSchedule", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("EndTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Message")
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)");
+
+                    b.Property<int>("Module")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("StartTime")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MaintenanceSchedule", "SystemConfig");
                 });
 
             modelBuilder.Entity("Volo.Abp.AuditLogging.AuditLog", b =>

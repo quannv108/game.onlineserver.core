@@ -1,4 +1,5 @@
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.EntityFrameworkCore;
 using Qna.Game.OnlineServer.Schema;
@@ -10,6 +11,7 @@ namespace Qna.Game.OnlineServer.Game;
 [Index(nameof(IsActive))]
 public class Game : Entity<long>, IEquatable<Game>
 {
+    [MaxLength(GameConsts.NameMaxLength)]
     public string Name { get; set; }
     
     public GameType Type { get; set; }

@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Qna.Game.OnlineServer.Migrations
 {
     /// <inheritdoc />
-    public partial class CreateFriendshipInvitation : Migration
+    public partial class AddFriendshipInvitationTable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -22,7 +22,7 @@ namespace Qna.Game.OnlineServer.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     FromUserId = table.Column<Guid>(type: "uuid", nullable: false),
                     ToUserId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Message = table.Column<string>(type: "text", nullable: true),
+                    Message = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
                     Status = table.Column<int>(type: "integer", nullable: false),
                     CreationTime = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     CreatorId = table.Column<Guid>(type: "uuid", nullable: true),

@@ -1,3 +1,4 @@
+using Qna.Game.OnlineServer.Maintenance.Managers;
 using Qna.Game.OnlineServer.Session;
 using Qna.Game.OnlineServer.SignalR.Contracts.Hub.Core;
 using Qna.Game.OnlineServer.SignalR.Contracts.Match;
@@ -23,9 +24,17 @@ public abstract class HubBase<THub, TClientAction> : AbpHub<TClientAction>
     protected IMatchService MatchService =>
         LazyServiceProvider.LazyGetRequiredService<MatchService<THub, TClientAction>>();
 
+    private IMaintenanceScheduleManager MaintenanceScheduleManager =>
+        LazyServiceProvider.LazyGetRequiredService<IMaintenanceScheduleManager>();
+
     [SignalRHidden]
     public override async Task OnConnectedAsync()
     {
+        if (await MaintenanceScheduleManager.IsSignalROnMaintenanceAsync())
+        {
+            Context.Abort();
+        }
+        
         var connectionId = Context.ConnectionId;
         Logger.LogInformation($"onConnected username = {CurrentUser.UserName} in connectionId {connectionId}");
         var userId = CurrentUser.Id!.Value;

@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using Qna.Game.OnlineServer.Repository;
+using Qna.Game.OnlineServer.Core.Repository;
 using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Domain.Services;
 

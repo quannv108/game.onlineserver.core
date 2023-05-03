@@ -2,6 +2,8 @@
 using Qna.Game.OnlineServer.Friendship;
 using Qna.Game.OnlineServer.Friendship.Dto;
 using Qna.Game.OnlineServer.Game.Dto;
+using Qna.Game.OnlineServer.Maintenance;
+using Qna.Game.OnlineServer.Maintenance.Dto;
 using Volo.Abp.Identity;
 
 namespace Qna.Game.OnlineServer;
@@ -19,5 +21,7 @@ public class OnlineServerApplicationAutoMapperProfile : Profile
         CreateMap<IdentityUser, FriendUserDto>();
         CreateMap<FriendshipInvitation, FriendshipInvitationDto>()
             .ForMember(x => x.RequestTime, y => y.MapFrom(z => z.CreationTime));
+
+        CreateMap<MaintenanceSchedule, MaintenanceScheduleDto>();
     }
 }

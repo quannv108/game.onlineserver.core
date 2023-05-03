@@ -2,7 +2,7 @@ using System.Linq;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Repositories;
 
-namespace Qna.Game.OnlineServer.Repository;
+namespace Qna.Game.OnlineServer.Core.Repository;
 
 public static class RepositoryExtensions
 {
