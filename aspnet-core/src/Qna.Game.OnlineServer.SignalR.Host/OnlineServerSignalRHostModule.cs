@@ -188,7 +188,7 @@ public class OnlineServerSignalRHostModule : AbpModule
 
         if (!env.IsDevelopment())
         {
-            app.UseErrorPage();
+            // app.UseErrorPage();
         }
 
         app.UseCorrelationId();

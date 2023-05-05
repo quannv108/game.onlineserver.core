@@ -191,8 +191,9 @@ public class OnlineServerHttpApiHostModule : AbpModule
 
         if (!env.IsDevelopment())
         {
-            app.UseErrorPage();
+            // app.UseErrorPage();
         }
+        app.UseHttpsRedirection();
 
         app.UseCorrelationId();
         app.UseStaticFiles();

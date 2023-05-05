@@ -8,7 +8,6 @@ EXPOSE 443
 
 ENV DOTNET_RUNNING_IN_CONTAINER=true
 ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
-ENV ASPNETCORE_URLS=http://+:80;https://+:443
 
 RUN apk add --no-cache icu-libs
 
@@ -29,6 +28,7 @@ RUN dotnet publish "Qna.Game.OnlineServer.SignalR.Host.csproj" -c Release -o /ap
 
 FROM base AS final
 
+ENV ASPNETCORE_URLS=http://+:80;https://+:443
 ENV ASPNETCORE_HTTPS_PORT=44335
 ENV ASPNETCORE_Kestrel__Certificates__Default__Password=12345678
 ENV ASPNETCORE_Kestrel__Certificates__Default__Path=/https/Qna.Game.OnlineServer.SignalR.Host.pfx
