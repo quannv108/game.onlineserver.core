@@ -6,6 +6,7 @@ using Qna.Game.OnlineServer.SignalR.Client.Client;
 using Qna.Game.OnlineServer.SignalR.Client.Client.Core;
 using Qna.Game.OnlineServer.SignalR.Client.Client.TicTacToe;
 using Qna.Game.OnlineServer.SignalR.Tests;
+using Qna.Game.OnlineServer.SignalR.Tests.TicTacToe;
 using Qna.Game.OnlineServer.SignalR.Tests2;
 
 Console.WriteLine("Hello, World!");

@@ -8,12 +8,14 @@ namespace Qna.Game.OnlineServer.SignalR.Hub.Test;
 [SignalRHub]
 public class TestHub : AbpHub
 {
+    [SignalRHidden]
     public override Task OnConnectedAsync()
     {
         Logger.LogInformation("onConnected");
         return base.OnConnectedAsync();
     }
 
+    [SignalRHidden]
     public override Task OnDisconnectedAsync(Exception? exception)
     {
         Logger.LogInformation("onDisconnected");

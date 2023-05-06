@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Qna.Game.OnlineServer.EntityFrameworkCore;
@@ -12,9 +13,11 @@ using Volo.Abp.EntityFrameworkCore;
 namespace Qna.Game.OnlineServer.Migrations
 {
     [DbContext(typeof(OnlineServerDbContext))]
-    partial class OnlineServerDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230506064344_Upgrade_To_Abp_7.2.1")]
+    partial class UpgradeToAbp721
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

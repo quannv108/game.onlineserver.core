@@ -1,15 +1,19 @@
-using Qna.Game.OnlineServer.SignalR.Client.Client.Core;
 using Qna.Game.OnlineServer.SignalR.Client.Client.Core.Models;
 using Qna.Game.OnlineServer.SignalR.Client.Client.TicTacToe;
 using Qna.Game.OnlineServer.SignalR.Contracts.Match;
 
-namespace Qna.Game.OnlineServer.SignalR.Tests;
+namespace Qna.Game.OnlineServer.SignalR.Tests.TicTacToe;
 
 public class TicTacToeClient : TicTacToeConnection
 {
     public TicTacToeClient(ITicTacToeCallbackHandler messageCallbackHandler)
-        : base("https://localhost:44325",
-            "https://localhost:44335",
+        : base(
+            "https://dev.quannv.click:44325",
+            "https://dev.quannv.click:44335",
+            // "https://host.docker.internal:44325",
+            // "https://host.docker.internal:44335",
+            // "https://localhost:44325",
+            // "https://localhost:44335",
             new UserCredentials
             {
                 Username = "testuser",

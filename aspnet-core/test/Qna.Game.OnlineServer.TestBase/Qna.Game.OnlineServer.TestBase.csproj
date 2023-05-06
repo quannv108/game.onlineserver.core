@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <Import Project="..\..\common.props" />
 
@@ -9,9 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Volo.Abp.TestBase" Version="7.1.1" />
-    <PackageReference Include="Volo.Abp.Autofac" Version="7.1.1" />
-    <PackageReference Include="Volo.Abp.Authorization" Version="7.1.1" />
+    <PackageReference Include="Volo.Abp.TestBase" Version="7.2.1" />
+    <PackageReference Include="Volo.Abp.Autofac" Version="7.2.1" />
+    <PackageReference Include="Volo.Abp.Authorization" Version="7.2.1" />
     <ProjectReference Include="..\..\src\Qna.Game.OnlineServer.Domain\Qna.Game.OnlineServer.Domain.csproj" />
   </ItemGroup>
 

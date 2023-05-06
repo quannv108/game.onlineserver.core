@@ -7,7 +7,7 @@ using Qna.Game.OnlineServer.SignalR.Contracts.Match;
 using Qna.Game.OnlineServer.SignalR.Contracts.Match.Events;
 using Qna.Game.OnlineServer.SignalR.Contracts.Users;
 
-namespace Qna.Game.OnlineServer.SignalR.Tests;
+namespace Qna.Game.OnlineServer.SignalR.Tests.TicTacToe;
 
 public class MessageCallbackHandler : ITicTacToeCallbackHandler
 {

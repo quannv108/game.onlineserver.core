@@ -1,10 +1,10 @@
 ### Development:
 Just run in localhost, it supported https by default
 
-### Using with localhost docker (obsoleted-not-use-any-more)
+### Using with localhost docker
 https://github.com/dotnet/dotnet-docker/blob/main/samples/host-aspnetcore-https.md
 
-### TODO: dev EC2: using certbot for certificate
+### TODO: dev EC2: using certbot for certificate and mount to docker when run
 https://dev.to/___bn___/free-certified-ssl-certificate-in-asp-net-5-kestrel-application-kgn
 
 ### TODO: dev EC2: auto review certificate

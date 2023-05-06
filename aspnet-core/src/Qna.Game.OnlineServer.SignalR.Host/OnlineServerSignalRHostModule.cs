@@ -2,14 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Qna.Game.OnlineServer.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using OpenIddict.Abstractions;
+using OpenIddict.Validation;
 using OpenIddict.Validation.AspNetCore;
 using Qna.Game.OnlineServer.SignalR;
 using Volo.Abp;
@@ -44,6 +48,8 @@ public class OnlineServerSignalRHostModule : AbpModule
     public override void PreConfigureServices(ServiceConfigurationContext context)
     {
         var configuration = context.Services.GetConfiguration();
+        var hostingEnvironment = context.Services.GetHostingEnvironment();
+        var jwtSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration["Jwt:SigningKey"]));
         PreConfigure<OpenIddictBuilder>(builder =>
         {
             builder.AddValidation(options =>
@@ -52,6 +58,20 @@ public class OnlineServerSignalRHostModule : AbpModule
                 options.SetIssuer(configuration["AuthServer:Authority"]);
                 options.UseLocalServer();
                 options.UseAspNetCore();
+                options.Configure((o) =>
+                {
+                    o.TokenValidationParameters.IssuerSigningKey = jwtSigningKey;
+                    var validIssuers = new List<string>
+                    {
+                        configuration["AuthServer:Authority"] + "/"
+                    };
+                    if (hostingEnvironment.IsDevelopment())
+                    {
+                        validIssuers.Add("https://host.docker.internal:44325/");
+                        validIssuers.Add("https://dev.quannv.click:44325/");
+                    }
+                    o.TokenValidationParameters.ValidIssuers = validIssuers;
+                });
             });
         });
     }
@@ -191,6 +211,7 @@ public class OnlineServerSignalRHostModule : AbpModule
             // app.UseErrorPage();
         }
 
+        app.UseHttpsRedirection();
         app.UseCorrelationId();
         app.UseStaticFiles();
         app.UseRouting();

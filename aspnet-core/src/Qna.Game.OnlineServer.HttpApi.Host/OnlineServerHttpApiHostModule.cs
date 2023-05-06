@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 using Qna.Game.OnlineServer.EntityFrameworkCore;
 using Qna.Game.OnlineServer.MultiTenancy;
 using Volo.Abp.AspNetCore.Mvc.UI.Theme.LeptonXLite;
@@ -47,6 +49,9 @@ public class OnlineServerHttpApiHostModule : AbpModule
 {
     public override void PreConfigureServices(ServiceConfigurationContext context)
     {
+        var configuration = context.Services.GetConfiguration();
+        var jwtSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(configuration["Jwt:SigningKey"]));
+        
         PreConfigure<OpenIddictBuilder>(builder =>
         {
             builder.AddValidation(options =>
@@ -54,6 +59,14 @@ public class OnlineServerHttpApiHostModule : AbpModule
                 options.AddAudiences("OnlineServer");
                 options.UseLocalServer();
                 options.UseAspNetCore();
+                options.Configure((o) =>
+                {
+                    o.TokenValidationParameters.IssuerSigningKey = jwtSigningKey;
+                });
+            });
+            builder.AddServer(builder =>
+            {
+                builder.AddSigningKey(jwtSigningKey);
             });
         });
     }

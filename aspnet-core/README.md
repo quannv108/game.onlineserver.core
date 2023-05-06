@@ -35,25 +35,32 @@ create new user,set password and create and database
 Set current working directory to `asp-netcore` folder.
 
 Then run this command to build docker images
->
-> docker build -f Migrator.Dockerfile -t gameonline-server-migrator-publish .
-> 
-> docker build -f Api.Dockerfile -t gameonline-server-api-publish .
->
-> docker build -f SignalR.Dockerfile -t gameonline-server-signalr-publish .
+```shell
+docker build -f Migrator.Dockerfile -t gameonline-server-migrator-publish .
+```
+```shell
+docker build -f Api.Dockerfile -t gameonline-server-api-publish .
+```
+```shell
+docker build -f SignalR.Dockerfile -t gameonline-server-signalr-publish .
+```
 
 Then you will have 3 docker images.
 
 ## Deployment
 * Copy all `appsettings.json` file which is generated from above step to server
-* 
+
 To run docker, use these command
 
-> docker run --rm --name gameonline-server-migrator gameonline-server-migrator-publish:latest
-> 
-> docker run -p 44325:443 --name gameonline-server-api -d gameonline-server-api-publish:latest
-> 
-> docker run -p 44335:443 --name gameonline-server-signalr -d gameonline-server-signalr-publish:latest
+```shell
+docker run --rm --name gameonline-server-migrator gameonline-server-migrator-publish:latest
+```
+```shell
+docker run -p 44325:443 --name gameonline-server-api -d gameonline-server-api-publish:latest
+```
+```shell
+docker run -p 44335:443 --name gameonline-server-signalr -d gameonline-server-signalr-publish:latest
+```
 
 `Migrator` should be run first when start new deployment, and it will run once then stop.
 
@@ -61,37 +68,54 @@ To run docker, use these command
 
 ## Deploy in AWS EC2 (Example with dev env)
 Need to login into `Elastic Registry Container`.
-> aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/a9z0m0c0
+```shell
+aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin public.ecr.aws/a9z0m0c0
+```
 
 * Tag & push current docker images to `Elastic Registry Container`
-> docker tag gameonline-server-migrator-publish public.ecr.aws/a9z0m0c0/gameonline-migrator:latest
-> 
-> docker push public.ecr.aws/a9z0m0c0/gameonline-migrator:latest
-> 
-> docker tag gameonline-server-api-publish public.ecr.aws/a9z0m0c0/gameonline-api:latest
-> 
-> docker push public.ecr.aws/a9z0m0c0/gameonline-api:latest
-> 
-> docker tag gameonline-server-signalr-publish public.ecr.aws/a9z0m0c0/gameonline-signalr:latest
-> 
-> docker push public.ecr.aws/a9z0m0c0/gameonline-signalr:latest
-> 
+```shell
+docker tag gameonline-server-migrator-publish public.ecr.aws/a9z0m0c0/gameonline-migrator:latest
+```
+```shell
+docker push public.ecr.aws/a9z0m0c0/gameonline-migrator:latest
+```
+```shell
+docker tag gameonline-server-api-publish public.ecr.aws/a9z0m0c0/gameonline-api:latest
+```
+```shell
+docker push public.ecr.aws/a9z0m0c0/gameonline-api:latest
+```
+```shell
+docker tag gameonline-server-signalr-publish public.ecr.aws/a9z0m0c0/gameonline-signalr:latest
+```
+```shell
+docker push public.ecr.aws/a9z0m0c0/gameonline-signalr:latest
+```
 * Connect to EC2 via ssh connection
 
-* then start docker in order 
-> docker start postgres (if postgres already start last session but now stoped, else run command in `setup postgres` step)
+* then start docker in order
 
-> docker pull public.ecr.aws/a9z0m0c0/gameonline-migrator:latest
-> 
-> docker run --rm --name migrator public.ecr.aws/a9z0m0c0/gameonline-migrator:latest
->
-> docker pull public.ecr.aws/a9z0m0c0/gameonline-api:latest
-> 
-> docker run -p 44325:443 --name api -d public.ecr.aws/a9z0m0c0/gameonline-api:latest
->
-> docker pull public.ecr.aws/a9z0m0c0/gameonline-signalr:latest
-> 
-> docker run -p 44335:443 --name signalr -d public.ecr.aws/a9z0m0c0/gameonline-signalr:latest
+```shell 
+docker start postgres 
+```
+```shell
+docker pull public.ecr.aws/a9z0m0c0/gameonline-migrator:latest
+```
+```shell
+docker run --rm --name migrator public.ecr.aws/a9z0m0c0/gameonline-migrator:latest
+```
+```shell
+docker pull public.ecr.aws/a9z0m0c0/gameonline-api:latest
+```
+```shell
+docker run -p 44325:443 --name api -d public.ecr.aws/a9z0m0c0/gameonline-api:latest
+```
+```shell
+docker pull public.ecr.aws/a9z0m0c0/gameonline-signalr:latest
+```
+```shell
+docker run -p 44335:443 --name signalr -d public.ecr.aws/a9z0m0c0/gameonline-signalr:latest
+```
 
 TODO: current ssl certificate is working inside dockerfile, but it's self-signed
     
