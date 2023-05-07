@@ -4,6 +4,8 @@ using Qna.Game.OnlineServer.Friendship.Dto;
 using Qna.Game.OnlineServer.Game.Dto;
 using Qna.Game.OnlineServer.Maintenance;
 using Qna.Game.OnlineServer.Maintenance.Dto;
+using Qna.Game.OnlineServer.Notifications;
+using Qna.Game.OnlineServer.Notifications.Dto;
 using Volo.Abp.Identity;
 
 namespace Qna.Game.OnlineServer;
@@ -23,5 +25,7 @@ public class OnlineServerApplicationAutoMapperProfile : Profile
             .ForMember(x => x.RequestTime, y => y.MapFrom(z => z.CreationTime));
 
         CreateMap<MaintenanceSchedule, MaintenanceScheduleDto>();
+
+        CreateMap<NotificationMessage, NotificationMessageDto>();
     }
 }

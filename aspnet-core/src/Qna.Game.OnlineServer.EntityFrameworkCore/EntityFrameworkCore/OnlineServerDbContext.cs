@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Qna.Game.OnlineServer.Friendship;
 using Qna.Game.OnlineServer.Maintenance;
+using Qna.Game.OnlineServer.Notifications;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
 using Volo.Abp.BackgroundJobs.EntityFrameworkCore;
 using Volo.Abp.Data;
@@ -58,7 +59,11 @@ public class OnlineServerDbContext :
     #region Features
 
     public DbSet<FriendshipInvitation> FriendRequestInvitations { get; set; }
+    
     public DbSet<MaintenanceSchedule> MaintenanceSchedules { get; set; }
+    
+    public DbSet<NotificationMessage> NotificationMessages { get; set; }
+    public DbSet<NotificationMessageTemplate> NotificationMessageTemplates { get; set; }
 
     #endregion
     

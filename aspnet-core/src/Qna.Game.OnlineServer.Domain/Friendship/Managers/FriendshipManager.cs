@@ -22,6 +22,10 @@ public class FriendshipManager : DomainService, IFriendshipManager
 
     public async Task CreateInvitationAsync(Guid fromUserId, Guid toUserId, string message)
     {
+        if (fromUserId.Equals(toUserId))
+        {
+            throw new UserFriendlyException("can not send invitation to myself");
+        }
         var existing = await _friendRequestRepository.GetAll().AsNoTracking()
             .Where(x => x.FromUserId == fromUserId
                                  && x.ToUserId == toUserId)
@@ -66,7 +70,14 @@ public class FriendshipManager : DomainService, IFriendshipManager
         var newStatus = actionType.ToInvitationStatus();
         invitation.Status = newStatus;
 
-        await _friendRequestRepository.UpdateAsync(invitation);
+        if (newStatus == FriendRequestInvitationStatus.Rejected)
+        {
+            await _friendRequestRepository.DeleteAsync(invitation);
+        }
+        else
+        {
+            await _friendRequestRepository.UpdateAsync(invitation);
+        }
     }
 
     public Task<List<FriendshipInvitation>> GetAllPendingInvitationAsync(Guid userId)
