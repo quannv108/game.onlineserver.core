@@ -6,6 +6,6 @@ namespace Qna.Game.OnlineServer.SignalR.Session;
 public interface ISessionService : IApplicationService
 {
     UserConnectionSession Find(Guid userId);
-    Task AddAsync(Guid userId, string connectionId);
+    Task<UserConnectionSession> AddAsync(Guid userId, string connectionId);
     void Remove(Guid userId, string connectionId);
 }

@@ -31,17 +31,20 @@ public class GameDataSeedContributor : IDataSeedContributor, ITransientDependenc
         var needInsertGames = new List<Game>();
         foreach (var game in games)
         {
-            var existedGame =
+            var existingActiveGame =
                 await _gameRepository.GetAll().AsNoTracking().FirstOrDefaultAsync(x => x.Type == game.Type);
-            if (existedGame != null && existedGame.Equals(game))
+            switch (existingActiveGame)
             {
-                existedGame.Name = game.Name;
-                existedGame.IsActive = game.IsActive;
+                case { IsActive: true }:
+                    existingActiveGame.Name = game.Name;
+                    existingActiveGame.MinPlayer = game.MinPlayer;
+                    existingActiveGame.MaxPlayer = game.MaxPlayer;
                 
-                needUpdateGames.Add(existedGame);
-            }else if (existedGame == null)
-            {
-                needInsertGames.Add(game);
+                    needUpdateGames.Add(existingActiveGame);
+                    break;
+                case null:
+                    needInsertGames.Add(game);
+                    break;
             }
         }
 
@@ -58,13 +61,15 @@ public class GameDataSeedContributor : IDataSeedContributor, ITransientDependenc
 
     private static List<Game> GetGames()
     {
-        return new List<Game>()
+        return new List<Game>
         {
-            new Game
+            new()
             {
                 Type = GameType.TicTacToe,
                 Name = "TicTacToe",
-                IsActive = true
+                IsActive = true,
+                MinPlayer = 1,
+                MaxPlayer = 1
             }
         };
     }

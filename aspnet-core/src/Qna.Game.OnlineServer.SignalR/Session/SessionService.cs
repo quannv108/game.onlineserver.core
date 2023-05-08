@@ -29,12 +29,13 @@ public class SessionService<THub, TClientAction> : SignalRServiceBase<THub, TCli
         return _userConnectionSessionManager.GetByUserIdAsync(userId).Result;
     }
 
-    public async Task AddAsync(Guid userId, string connectionId)
+    public async Task<UserConnectionSession> AddAsync(Guid userId, string connectionId)
     {
         var session = await _userConnectionSessionManager.CreateOrUpdateAsync(userId, connectionId);
         Logger.LogInformation(
             $"added user {session.UserId} to session list: total users = " +
             $"{_userConnectionSessionManager.GetTotalSessionCountAsync().Result}");
+        return session;
     }
 
     public void Remove(Guid userId, string connectionId)

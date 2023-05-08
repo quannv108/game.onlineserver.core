@@ -1,3 +1,6 @@
+using Qna.Game.OnlineServer.Game;
+using Qna.Game.OnlineServer.Game.Managers;
+using Qna.Game.OnlineServer.GamePlay.Players.Managers;
 using Qna.Game.OnlineServer.Maintenance.Managers;
 using Qna.Game.OnlineServer.Session;
 using Qna.Game.OnlineServer.SignalR.Contracts.Hub.Core;
@@ -6,6 +9,7 @@ using Qna.Game.OnlineServer.SignalR.Contracts.Users;
 using Qna.Game.OnlineServer.SignalR.Match;
 using Qna.Game.OnlineServer.SignalR.Session;
 using SignalRSwaggerGen.Attributes;
+using Volo.Abp;
 using Volo.Abp.AspNetCore.SignalR;
 
 namespace Qna.Game.OnlineServer.SignalR.Hub.Core;
@@ -26,6 +30,13 @@ public abstract class HubBase<THub, TClientAction> : AbpHub<TClientAction>
 
     private IMaintenanceScheduleManager MaintenanceScheduleManager =>
         LazyServiceProvider.LazyGetRequiredService<IMaintenanceScheduleManager>();
+
+    private IGameManager GameManager =>
+        LazyServiceProvider.LazyGetRequiredService<GameManager>();
+    private IGamePlayerManager GamePlayerManager =>
+        LazyServiceProvider.LazyGetRequiredService<IGamePlayerManager>();
+    
+    protected abstract GameType Game { get; }
 
     [SignalRHidden]
     public override async Task OnConnectedAsync()
@@ -67,11 +78,23 @@ public abstract class HubBase<THub, TClientAction> : AbpHub<TClientAction>
     {
         Logger.LogInformation("hello from " + CurrentUser.UserName);
         var session = CurrentUserConnectionSession;
+        
+        var game = await GameManager.GetByTypeAsync(this.Game);
+        
+        var gamePlayerManager = GamePlayerManager;
+        await gamePlayerManager.CreateOneIfRequiredAsync(session.UserId, game);
+        session.CurrentPlayer = await gamePlayerManager.GetNearestPlayingAsync(session.UserId, game.Id);
+
+        if (game.MinPlayer > 0 && session.CurrentPlayer == null)
+        {
+            throw new UserFriendlyException("doesn't have any player");
+        }
+        
         await CallerClient.HiAsync(new GamePlayerDto
         {
-            Id = session.CurrentPlayer.Id,
+            Id = session.CurrentPlayer?.Id ?? default,
             UserId = session.UserId,
-            CurrentLevel = session.CurrentPlayer.CurrentLevel
+            CurrentLevel = session.CurrentPlayer?.CurrentLevel ?? 0
         });
     }
 

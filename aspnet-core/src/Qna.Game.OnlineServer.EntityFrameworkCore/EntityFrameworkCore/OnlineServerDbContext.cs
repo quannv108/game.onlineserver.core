@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Qna.Game.OnlineServer.Friendship;
+using Qna.Game.OnlineServer.GamePlay.Players;
 using Qna.Game.OnlineServer.Maintenance;
 using Qna.Game.OnlineServer.Notifications;
 using Volo.Abp.AuditLogging.EntityFrameworkCore;
@@ -70,6 +71,7 @@ public class OnlineServerDbContext :
     #region Game
 
     public DbSet<Game.Game> Games { get; set; }
+    public DbSet<GamePlayer> GamePlayers { get; set; }
 
     #endregion
 

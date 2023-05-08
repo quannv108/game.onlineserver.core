@@ -1,14 +1,19 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Qna.Game.OnlineServer.GamePlay;
+using Qna.Game.OnlineServer.GamePlay.Players;
 using Qna.Game.OnlineServer.MultiTenancy;
 using Qna.Game.OnlineServer.Room.Storage;
 using Qna.Game.OnlineServer.Session.Storage;
 using Volo.Abp.AuditLogging;
 using Volo.Abp.BackgroundJobs;
+using Volo.Abp.Domain.Entities.Caching;
 using Volo.Abp.Emailing;
 using Volo.Abp.FeatureManagement;
 using Volo.Abp.Identity;
+using Volo.Abp.Json.SystemTextJson;
+using Volo.Abp.Json.SystemTextJson.Modifiers;
 using Volo.Abp.Localization;
 using Volo.Abp.Modularity;
 using Volo.Abp.MultiTenancy;
@@ -63,6 +68,7 @@ public class OnlineServerDomainModule : AbpModule
         {
             options.IsEnabled = MultiTenancyConsts.IsEnabled;
         });
+        
 
 #if DEBUG
         context.Services.Replace(ServiceDescriptor.Singleton<IEmailSender, NullEmailSender>());
@@ -70,7 +76,15 @@ public class OnlineServerDomainModule : AbpModule
 
         context.Services.AddSingleton<IRoomStorage, RoomStorage>();
         context.Services.AddSingleton<IUserConnectionSessionStorage, UserConnectionSessionStorage>();
-
+        
+        context.Services.AddEntityCache<Game.Game, long>();
+        
+        // reference: https://github.com/abpframework/abp/issues/16158#issuecomment-1495330944
+        context.Services.Configure<AbpSystemTextJsonSerializerModifiersOptions>(options =>
+        {
+            options.Modifiers.Add(new AbpIncludeNonPublicPropertiesModifiers<GamePlayer, Guid>().CreateModifyAction(x => x.Id));
+        });
+        
         context.Services.AddTransient<IGameLoop<GamePlay.TicTacToe.Models.GamePlayData,
                 GamePlay.TicTacToe.TicTacToeGameState>,
             GamePlay.TicTacToe.GameLoop>();

@@ -1,3 +1,4 @@
+using Qna.Game.OnlineServer.Game;
 using Qna.Game.OnlineServer.SignalR.Contracts.GamePlay.TicTacToe.Dto;
 using Qna.Game.OnlineServer.SignalR.Contracts.Hub.TicTacToe;
 using Qna.Game.OnlineServer.SignalR.GamePlay.TicTacToe;
@@ -20,4 +21,6 @@ public class TicTacToeHub : HubBase<TicTacToeHub, ITicTacToeClientAction>, ITicT
     {
         return _gamePlayService.PutMarkAsync(CurrentUserConnectionSession, toBoardInput);
     }
+
+    protected override GameType Game => GameType.TicTacToe;
 }

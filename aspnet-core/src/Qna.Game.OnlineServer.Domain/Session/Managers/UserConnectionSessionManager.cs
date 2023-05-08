@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Qna.Game.OnlineServer.GamePlay;
 using Qna.Game.OnlineServer.GamePlay.Players;
+using Qna.Game.OnlineServer.GamePlay.Players.Managers;
 using Qna.Game.OnlineServer.Session.Events;
 using Qna.Game.OnlineServer.Session.Storage;
 using Volo.Abp;
@@ -28,11 +29,6 @@ public class UserConnectionSessionManager : DomainService, IUserConnectionSessio
     public async Task<UserConnectionSession> CreateOrUpdateAsync(Guid userId, string connectionId)
     {
         var session = new UserConnectionSession(userId, connectionId);
-        // TODO: get current selected player, for now just create dummy player
-        session.CurrentPlayer = new GamePlayer(userId)
-        {
-            CurrentLevel = 1
-        };
 
         var existing = _userConnectionSessionStorage.GetByUserId(userId);
         _userConnectionSessionStorage.CreateOrUpdate(session);
