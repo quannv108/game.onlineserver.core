@@ -1,5 +1,10 @@
 # Online Game Server
 
+A Simple Turn-Base game server using .NET Core 7, Abp.Io, SignalR, PostgreSql.
+Ability to scale out when spitted into 2 server: Game Server (SignalR) and API Services (Http API)
+
+![!docs/images/system_design.png](docs/images/system_design.png)
+
 ## Requirement
 * docker
 * python
@@ -117,6 +122,3 @@ docker pull public.ecr.aws/a9z0m0c0/gameonline-signalr:latest
 docker run -p 44335:443 --name signalr -d public.ecr.aws/a9z0m0c0/gameonline-signalr:latest
 ```
 
-TODO: current ssl certificate is working inside dockerfile, but it's self-signed
-    
-=> should using certbot to create certificate instead self-signed
