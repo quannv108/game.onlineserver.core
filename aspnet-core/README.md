@@ -3,7 +3,7 @@
 A Simple Turn-Base game server using .NET Core 7, Abp.Io, SignalR, PostgreSql.
 Ability to scale out when spitted into 2 server: Game Server (SignalR) and API Services (Http API)
 
-![!docs/images/system_design.png](docs/images/system_design.png)
+![!docs/Images/system_design.png](docs/Images/system_design.png)
 
 ## Requirement
 * docker
