@@ -286,6 +286,8 @@ SignalR.Dockerfile
 Migrator.Dockerfile
 *.md
 README.md
+docker-compose/
+docker-compose.yml
 
 # .env file contains default environment variables for docker
 .env

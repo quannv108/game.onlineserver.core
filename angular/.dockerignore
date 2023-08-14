@@ -1,0 +1,12 @@
+node_modules/
+dist/
+.angular/
+*.md
+*.ps1
+.git/
+.editorconfig
+.eslintrc.json
+.gitignore
+.dockerignore
+Dockerfile
+.prettierrc

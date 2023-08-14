@@ -1,0 +1,67 @@
+services:
+  migrator:
+    build:
+      context: ..
+      dockerfile: "Migrator.Dockerfile"
+    image: "public.ecr.aws/a9z0m0c0/gameonline-migrator:${TAG}"
+    container_name: "migrator"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - ".env"
+  api:
+    build:
+      context: ..
+      dockerfile: "Api.Dockerfile"
+    image: "public.ecr.aws/a9z0m0c0/gameonline-api:${TAG}"
+    container_name: "api"
+    ports:
+      - "44325:443"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrator:
+        condition: service_completed_successfully
+    env_file:
+      - ".env"
+  signalr:
+    build:
+      context: ..
+      dockerfile: "Api.Dockerfile"
+    image: "public.ecr.aws/a9z0m0c0/gameonline-signalr:${TAG}"
+    container_name: "signalr"
+    ports:
+      - "44335:443"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrator:
+        condition: service_completed_successfully
+      api:
+        condition: service_started
+    env_file:
+      - ".env"
+#  admin:
+#    build:
+#      context: ../../angular
+#      dockerfile: "Dockerfile"
+#    container_name: "admin_panel"
+#    ports:
+#      - "4200:4200"
+  postgres:
+    image: "postgres:latest"
+    ports:
+      - "5432:5432"
+    container_name: "postgres"
+    volumes:
+      - "/var/lib/postgresql/data:/var/lib/postgresql/data"
+    environment:
+      - "LANG=en_US.utf8"
+      - "PGDATA=/var/lib/postgresql/data"
+      - "POSTGRES_PASSWORD=postgrespw"
+    healthcheck:
+      test: [ "CMD-SHELL", "sh -c 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}'" ]
+      interval: 10s
+      timeout: 3s
+      retries: 3

@@ -1,6 +1,6 @@
 import { Environment } from '@abp/ng.core';
 
-const baseUrl = 'http://localhost:4200';
+const baseUrl = 'http://localhost:8080';
 
 export const environment = {
   production: true,
@@ -10,7 +10,7 @@ export const environment = {
     logoUrl: '',
   },
   oAuthConfig: {
-    issuer: 'https://localhost:44325/',
+    issuer: 'https://dev.quannv.click:44325/',
     redirectUri: baseUrl,
     clientId: 'OnlineServer_App',
     responseType: 'code',
@@ -19,7 +19,7 @@ export const environment = {
   },
   apis: {
     default: {
-      url: 'https://localhost:44325',
+      url: 'https://dev.quannv.click:44325',
       rootNamespace: 'Qna.Game.OnlineServer',
     },
   },
