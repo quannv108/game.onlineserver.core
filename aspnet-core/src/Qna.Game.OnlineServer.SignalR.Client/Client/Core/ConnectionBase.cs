@@ -94,10 +94,11 @@ public abstract class ConnectionBase : IAsyncDisposable, IClientConnection, IHub
         });
         var response = await httpClient.PostAsync(authEndpoint, formContent);
         if (response is not { IsSuccessStatusCode: true })
-            return null;
+        {
+            throw new Exception("unauthorized: " + response.Content.ReadAsStringAsync().Result);
+        }
         var responseContentStream = await response.Content.ReadAsStreamAsync();
         var getTokenOutput = JsonSerializer.Deserialize<GetTokenOutput>(responseContentStream);
-
         return getTokenOutput?.AccessToken;
     }
 

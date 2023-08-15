@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Qna.Game.OnlineServer.Game;
 using Qna.Game.OnlineServer.SignalR.Contracts.GamePlay.TicTacToe.Dto;
 using Qna.Game.OnlineServer.SignalR.Contracts.Hub.TicTacToe;
@@ -8,6 +9,7 @@ using SignalRSwaggerGen.Attributes;
 namespace Qna.Game.OnlineServer.SignalR.Hub.TicTacToe;
 
 [SignalRHub]
+[Authorize]
 public class TicTacToeHub : HubBase<TicTacToeHub, ITicTacToeClientAction>, ITicTacToeServerAction
 {
     private readonly IGamePlayService _gamePlayService;
