@@ -31,7 +31,6 @@
 
   <ItemGroup>
     <PackageReference Include="Volo.Abp.Autofac" Version="7.3.2" />
-    <ProjectReference Include="..\Qna.Game.OnlineServer.Application.Contracts\Qna.Game.OnlineServer.Application.Contracts.csproj" />
     <ProjectReference Include="..\Qna.Game.OnlineServer.EntityFrameworkCore\Qna.Game.OnlineServer.EntityFrameworkCore.csproj" />
   </ItemGroup>
 

@@ -3,7 +3,7 @@ services:
     build:
       context: ..
       dockerfile: "Migrator.Dockerfile"
-    image: "public.ecr.aws/a9z0m0c0/gameonline-migrator:${TAG}"
+    image: "public.ecr.aws/a9z0m0c0/gameonline-migrator:v${VERSION}-${TAG}"
     container_name: "migrator"
     depends_on:
       postgres:
@@ -14,7 +14,7 @@ services:
     build:
       context: ..
       dockerfile: "Api.Dockerfile"
-    image: "public.ecr.aws/a9z0m0c0/gameonline-api:${TAG}"
+    image: "public.ecr.aws/a9z0m0c0/gameonline-api:v${VERSION}-${TAG}"
     container_name: "api"
     ports:
       - "44325:443"
@@ -29,7 +29,7 @@ services:
     build:
       context: ..
       dockerfile: "Api.Dockerfile"
-    image: "public.ecr.aws/a9z0m0c0/gameonline-signalr:${TAG}"
+    image: "public.ecr.aws/a9z0m0c0/gameonline-signalr:v${VERSION}-${TAG}"
     container_name: "signalr"
     ports:
       - "44335:443"
@@ -42,13 +42,14 @@ services:
         condition: service_started
     env_file:
       - ".env"
-#  admin:
-#    build:
-#      context: ../../angular
-#      dockerfile: "Dockerfile"
-#    container_name: "admin_panel"
-#    ports:
-#      - "4200:4200"
+  admin_panel:
+    build:
+      context: ../../angular
+      dockerfile: "Dockerfile"
+    image: "public.ecr.aws/a9z0m0c0/gameonline-admin:v${VERSION}-${TAG}"
+    container_name: "admin_panel"
+    ports:
+      - "4200:8080"
   postgres:
     image: "postgres:latest"
     ports:

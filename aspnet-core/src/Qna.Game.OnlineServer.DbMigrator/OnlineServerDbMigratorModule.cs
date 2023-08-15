@@ -6,8 +6,7 @@ namespace Qna.Game.OnlineServer.DbMigrator;
 
 [DependsOn(
     typeof(AbpAutofacModule),
-    typeof(OnlineServerEntityFrameworkCoreModule),
-    typeof(OnlineServerApplicationContractsModule)
+    typeof(OnlineServerEntityFrameworkCoreModule)
     )]
 public class OnlineServerDbMigratorModule : AbpModule
 {
